@@ -51,6 +51,10 @@ module DeviseTokenAuth
         if require_client_password_reset_token?
           redirect_to DeviseTokenAuth::Url.generate(@redirect_url, reset_password_token: resource_params[:reset_password_token])
         else
+          if DeviseTokenAuth.cookie_enabled
+            set_token_in_cookie(@resource, token)
+          end
+
           redirect_header_options = { reset_password: true }
           redirect_headers = build_redirect_headers(token.token,
                                                     token.client,
@@ -182,7 +186,7 @@ module DeviseTokenAuth
 
     def render_not_found_error
       if Devise.paranoid
-        render_error(404, I18n.t('devise_token_auth.passwords.sended_paranoid'))
+        render_create_success
       else
         render_error(404, I18n.t('devise_token_auth.passwords.user_not_found', email: @email))
       end
