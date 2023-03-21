@@ -39,10 +39,12 @@ module DeviseTokenAuth
 
       return render_not_found_error unless @resource
 
-      @resource.send_confirmation_instructions({
-        redirect_url: redirect_url,
-        client_config: resource_params[:config_name]
-      })
+      if !@resource.instance_variable_get(:@skip_confirmation_notification)
+        @resource.send_confirmation_instructions({
+          redirect_url: redirect_url,
+          client_config: resource_params[:config_name]
+        })
+      end
 
       return render_create_success
     end
